@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Raspberry Pi Pinouts</title>
+
+  <style>
+    :root{
+      --header-bg:#2f8fff;
+      --screen-bg:#4f7dff;
+      --page-bg:#dfe9ff;
+      --text:#0a1a3a;
+      --shadow:0 10px 25px rgba(47,143,255,.22);
+    }
+
+    html[data-theme="dark"]{
+      --page-bg:#070a12;
+      --header-bg:#2a2f3a;
+      --screen-bg:#071225;
+      --text:#f4f6ff;
+      --shadow:0 12px 30px rgba(0,0,0,.45);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    /* IMPORTANT: allow page scroll */
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--page-bg);
+      color:var(--text);
+      display:grid;
+      place-items:start center;
+      padding:18px;
+      overflow-x:hidden;
+      overflow-y:auto;
+      transition: background-color .35s ease, color .35s ease;
+    }
+
+    /* outer stars (dark mode only) */
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      inset:-20%;
+      pointer-events:none;
+      opacity:0;
+      transition: opacity .35s ease;
+      z-index:-2;
+    }
+
+    html[data-theme="dark"] body::before{
+      opacity:1;
+      background:
+        radial-gradient(white 1px, transparent 1px),
+        radial-gradient(white 1px, transparent 1px),
+        radial-gradient(white 1px, transparent 1px),
+        radial-gradient(circle at 20% 20%, rgba(120,170,255,.20), transparent 45%),
+        radial-gradient(circle at 80% 30%, rgba(200,120,255,.16), transparent 45%),
+        linear-gradient(180deg, #02040b, #060a18);
+      background-size: 140px 140px, 220px 220px, 320px 320px, cover, cover, cover;
+      background-position: 0 0, 60px 90px, 140px 120px, center, center, center;
+      animation: starsSlow 90s linear infinite;
+    }
+
+    html[data-theme="dark"] body::after{
+      opacity:.85;
+      background: radial-gradient(white 1.5px, transparent 1.5px);
+      background-size: 70px 70px;
+      animation: starsFast 45s linear infinite;
+      z-index:-1;
+    }
+
+    @keyframes starsSlow{ from{transform:translateY(0)} to{transform:translateY(420px)} }
+    @keyframes starsFast{ from{transform:translateY(0)} to{transform:translateY(820px)} }
+
+    .app{
+      width:min(1100px,100%);
+      border-radius:12px;
+      overflow:hidden;
+      background:transparent;
+    }
+
+    .topbar{
+      position:sticky; /* stays visible while you scroll */
+      top:0;
+      z-index:50;
+      background:var(--header-bg);
+      padding:22px 18px 18px;
+      text-align:center;
+      border-radius:12px 12px 0 0;
+      transition: background-color .35s ease;
+    }
+
+    .topbar h1{
+      margin:0;
+      font-weight:700;
+      letter-spacing:.2px;
+      font-size:clamp(20px,3vw,36px);
+    }
+
+    /* back link */
+    .back{
+      position:absolute;
+      left:16px;
+      top:16px;
+      text-decoration:none;
+      font-weight:800;
+      padding:10px 12px;
+      border-radius:12px;
+      background:rgba(255,255,255,.25);
+      color:inherit;
+      border:1px solid rgba(255,255,255,.25);
+      transition: transform .15s ease, background .2s ease;
+    }
+    .back:hover{ transform:scale(1.03); background:rgba(255,255,255,.32); }
+    html[data-theme="dark"] .back{
+      background:rgba(0,0,0,.25);
+      border-color:rgba(255,255,255,.15);
+    }
+
+    /* theme button (snake) */
+    .theme-btn{
+      position:absolute;
+      top:16px;
+      right:16px;
+      width:120px;
+      height:42px;
+
+      border-radius:14px;
+      border:2px solid rgba(0,0,0,.18);
+
+      background:#111;
+      color:#fff;
+
+      cursor:pointer;
+      box-shadow: 0 10px 22px rgba(0,0,0,.22);
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+
+      overflow:hidden;
+
+      transition: background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .18s ease;
+    }
+
+    html[data-theme="dark"] .theme-btn{
+      background:#fff;
+      color:#111;
+      border-color: rgba(255,255,255,.28);
+      box-shadow: 0 10px 26px rgba(0,0,0,.45);
+    }
+
+    .theme-btn .btn-text{
+      font-weight:900;
+      letter-spacing:.3px;
+      font-size:14px;
+    }
+
+    .theme-btn::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:14px;
+      padding:2px;
+
+      background: conic-gradient(
+        from var(--angle, 0deg),
+        transparent 0deg,
+        gold 42deg,
+        transparent 84deg
+      );
+
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .theme-btn::after{
+      content:"";
+      position:absolute;
+      inset:-10px;
+      border-radius:22px;
+      background: radial-gradient(circle, rgba(255,215,0,.28), rgba(255,215,0,0) 62%);
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .theme-btn:hover{ animation: btnPulse .22s ease-out 1; }
+    .theme-btn:hover::before{ opacity:1; animation: snake 1.2s linear infinite; }
+    .theme-btn:hover::after{ opacity:1; }
+    .theme-btn:active{ transform: scale(0.98); }
+
+    @keyframes btnPulse{
+      0%{transform:scale(1)}
+      60%{transform:scale(1.07)}
+      100%{transform:scale(1)}
+    }
+    @keyframes snake{
+      from { --angle: 0deg; }
+      to   { --angle: 360deg; }
+    }
+
+    /* Screen area (scroll is on BODY, but this holds content nicely) */
+    .screen{
+      position:relative;
+      background:var(--screen-bg);
+      padding:clamp(16px,2.5vw,34px);
+      border-radius:0 0 12px 12px;
+      transition: background-color .35s ease;
+      overflow:hidden;
+    }
+
+    /* subtle animated dark screen */
+    .screen::before,
+    .screen::after{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .35s ease;
+    }
+    html[data-theme="dark"] .screen::before{
+      opacity:1;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(120,170,255,.22), transparent 42%),
+        radial-gradient(circle at 82% 28%, rgba(170,120,255,.18), transparent 45%),
+        radial-gradient(circle at 50% 82%, rgba(120,255,220,.12), transparent 55%),
+        linear-gradient(180deg, #061028, #050814);
+      filter:saturate(1.2) contrast(1.05);
+      animation: nebulaDrift 14s ease-in-out infinite;
+    }
+    html[data-theme="dark"] .screen::after{
+      opacity:.70;
+      background: radial-gradient(rgba(255,255,255,.16) 1px, transparent 1px);
+      background-size: 22px 22px;
+      mix-blend-mode: screen;
+      animation: sparkle 5.2s ease-in-out infinite;
+    }
+
+    @keyframes nebulaDrift{
+      0%{transform:translate3d(-2%,-1%,0) scale(1.02)}
+      50%{transform:translate3d( 2%, 1%,0) scale(1.03)}
+      100%{transform:translate3d(-2%,-1%,0) scale(1.02)}
+    }
+    @keyframes sparkle{
+      0%,100%{transform:translate3d(0,0,0); opacity:.50}
+      50%{transform:translate3d(1.2%,-.9%,0); opacity:.92}
+    }
+
+    .content{ position:relative; z-index:1; padding-top:18px; }
+
+    /* stacked image cards */
+    .stack{
+      display:grid;
+      gap:22px;
+      max-width:1000px;
+      margin:0 auto;
+    }
+
+    .pinout{
+      background:rgba(255,255,255,.20);
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow: var(--shadow);
+    }
+    html[data-theme="dark"] .pinout{
+      background:rgba(0,0,0,.25);
+      border-color: rgba(255,255,255,.14);
+    }
+
+    .pinout img{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+
+    .caption{
+      padding:12px 14px;
+      font-weight:800;
+      letter-spacing:.2px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      opacity:.95;
+    }
+    .hint{
+      font-weight:650;
+      opacity:.8;
+      font-size:14px;
+    }
+
+    @media (max-width: 720px){
+      .topbar{ padding-top:18px; }
+      .theme-btn{ top:12px; right:12px; }
+      .back{ top:12px; left:12px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header class="topbar">
+      <a class="back" href="index.html">← Back</a>
+      <h1>Raspberry Pi Pinouts</h1>
+      <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">
+        <span class="btn-text" id="themeLabel">Dark</span>
+      </button>
+    </header>
+
+    <section class="screen">
+      <div class="content">
+        <div class="stack">
+          <!-- Add as many as you want (stacked) -->
+          <div class="pinout">
+            <img src="./assets/Raspberry_Pi_3_GPIO_diagram.jpg" alt="Raspberry Pi 3 GPIO Pinout">
+            <div class="caption">
+              <span>Raspberry Pi 3 GPIO</span>
+              <span class="hint">40-pin header</span>
+            </div>
+          </div>
+
+          <div class="pinout">
+            <img src="./assets/Raspberry_Pi_4_GPIO_diagram.png" alt="Raspberry Pi 4 GPIO Pinout">
+            <div class="caption">
+              <span>Raspberry Pi 4 GPIO</span>
+              <span class="hint">Same 40-pin header layout</span>
+            </div>
+          </div>
+
+          <div class="pinout">
+            <img src="./assets/Raspberry_Pi_5_GPIO_diagram.jpg" alt="Raspberry Pi 5 GPIO Pinout">
+            <div class="caption">
+              <span>Raspberry Pi 5 GPIO</span>
+              <span class="hint">Same header, different board</span>
+            </div>
+          </div>
+
+          <div class="pinout">
+            <img src="./assets/Raspberry_pi_pico_w_pinout.png" alt="Raspberry Pi Pico Pinout">
+            <div class="caption">
+              <span>Raspberry Pi Pico / Pico W</span>
+              <span class="hint">Different board / different pinout</span>
+            </div>
+          </div>
+
+          <div class="pinout">
+            <img src="./assets/Raspberry-Zero-pinout.jpg" alt="Raspberry Pi Zero GPIO Pinout">
+            <div class="caption">
+              <span>Raspberry Pi Zero</span>
+              <span class="hint">Also 40-pin header (older models vary)</span>
+            </div>
+          </div>
+
+          <!-- copy/paste more pinout blocks here -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const root = document.documentElement;
+    const btn = document.getElementById("themeBtn");
+    const label = document.getElementById("themeLabel");
+
+    function syncLabel() {
+      const isDark = root.getAttribute("data-theme") === "dark";
+      // label shows what you'll switch TO
+      label.textContent = isDark ? "Light" : "Dark";
+    }
+
+    function setTheme(theme) {
+      if (theme === "dark") root.setAttribute("data-theme", "dark");
+      else root.removeAttribute("data-theme");
+      localStorage.setItem("theme", theme);
+      syncLabel();
+    }
+
+    const saved = localStorage.getItem("theme");
+    setTheme(saved === "dark" ? "dark" : "light");
+
+    btn.addEventListener("click", () => {
+      const isDark = root.getAttribute("data-theme") === "dark";
+      setTheme(isDark ? "light" : "dark");
+    });
+  </script>
+</body>
+</html>

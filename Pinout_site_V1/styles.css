@@ -1,0 +1,374 @@
+/* styles.css */
+
+/* =========================
+   EASY SETTINGS (edit these)
+   ========================= */
+:root{
+  /* Cool blue LIGHT mode (clean + modern) */
+  --header-bg:#2f8fff;     /* bright, friendly blue */
+  --screen-bg:#4f7dff;     /* rich but still light blue */
+  --card-bg:#6fbf8f;       /* calm green accent */
+  --page-bg:#dfe9ff;       /* light cool-blue background */
+  --text:#0a1a3a;          /* deep navy for readability */
+
+  --shadow:0 10px 25px rgba(47,143,255,.22);
+}
+
+
+
+/* Dark mode overrides */
+html[data-theme="dark"]{
+  --page-bg:#070a12;
+  --header-bg:#2a2f3a;
+  --screen-bg:#071225;
+  --text:#f4f6ff;
+}
+
+/* Base */
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:var(--page-bg);
+  color:var(--text);
+  display:grid;
+  place-items:center;
+  padding:18px;
+  overflow:hidden;
+  transition: background-color .35s ease, color .35s ease;
+}
+
+/* ==========================================
+   OUTER STARS (around the app) - dark mode
+   ========================================== */
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  inset:-20%;
+  pointer-events:none;
+  opacity:0;
+  transition: opacity .35s ease;
+  z-index:-2;
+}
+
+html[data-theme="dark"] body::before{
+  opacity:1;
+  background:
+    radial-gradient(white 1px, transparent 1px),
+    radial-gradient(white 1px, transparent 1px),
+    radial-gradient(white 1px, transparent 1px),
+    radial-gradient(circle at 20% 20%, rgba(120,170,255,.20), transparent 45%),
+    radial-gradient(circle at 80% 30%, rgba(200,120,255,.16), transparent 45%),
+    linear-gradient(180deg, #02040b, #060a18);
+  background-size:
+    140px 140px,
+    220px 220px,
+    320px 320px,
+    cover,
+    cover,
+    cover;
+  background-position:
+    0 0,
+    60px 90px,
+    140px 120px,
+    center,
+    center,
+    center;
+  animation: starsSlow 90s linear infinite;
+}
+
+html[data-theme="dark"] body::after{
+  opacity:.85;
+  background: radial-gradient(white 1.5px, transparent 1.5px);
+  background-size: 70px 70px;
+  animation: starsFast 45s linear infinite;
+  z-index:-1;
+}
+
+@keyframes starsSlow{ from{transform:translateY(0)} to{transform:translateY(420px)} }
+@keyframes starsFast{ from{transform:translateY(0)} to{transform:translateY(820px)} }
+
+/* App container */
+.app{
+  width:min(1100px,100%);
+  border-radius:8px;
+  overflow:hidden;
+  background:transparent;
+}
+
+/* Header */
+.topbar{
+  position:relative;
+  background:var(--header-bg);
+  padding:26px 18px 22px;
+  text-align:center;
+  transition: background-color .35s ease;
+}
+.topbar h1{
+  margin:0;
+  font-weight:500;
+  letter-spacing:.2px;
+  font-size:clamp(26px,3.6vw,44px);
+}
+
+/* =========================
+   THEME BUTTON (SNAKE BORDER)
+   - light mode: dark button
+   - dark mode: white button
+   - hover: pulse once + gold "snake" runs around border
+   ========================= */
+.theme-btn{
+  position:absolute;
+  top:16px;
+  right:16px;
+
+  width:120px;
+  height:42px;
+
+  border-radius:14px;
+  border:2px solid rgba(0,0,0,.18);
+
+  background:#111;   /* light mode */
+  color:#fff;
+
+  cursor:pointer;
+  box-shadow: 0 10px 22px rgba(0,0,0,.22);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  user-select:none;
+  -webkit-tap-highlight-color: transparent;
+
+  overflow:hidden;
+
+  transition: background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .18s ease;
+}
+
+html[data-theme="dark"] .theme-btn{
+  background:#fff;
+  color:#111;
+  border-color: rgba(255,255,255,.28);
+  box-shadow: 0 10px 26px rgba(0,0,0,.45);
+}
+
+.theme-btn .btn-text{
+  font-weight:700;
+  letter-spacing:.3px;
+  font-size:14px;
+}
+
+.theme-btn .dot{
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  background: currentColor;
+  opacity:.85;
+}
+
+/* Snake border layer */
+.theme-btn::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:14px;
+  padding:2px;
+
+  /* the "snake" segment */
+  background:
+    conic-gradient(
+      from var(--angle, 0deg),
+      transparent 0deg,
+      gold 42deg,
+      transparent 84deg
+    );
+
+  /* keep only the ring */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  opacity:0;
+  pointer-events:none;
+}
+
+/* Optional soft gold glow */
+.theme-btn::after{
+  content:"";
+  position:absolute;
+  inset:-10px;
+  border-radius:22px;
+  background: radial-gradient(circle, rgba(255,215,0,.28), rgba(255,215,0,0) 62%);
+  opacity:0;
+  pointer-events:none;
+}
+
+/* Hover triggers snake + pulse */
+.theme-btn:hover{
+  animation: btnPulse .22s ease-out 1;
+}
+.theme-btn:hover::before{
+  opacity:1;
+  animation: snake 1.2s linear infinite;
+}
+.theme-btn:hover::after{
+  opacity:1;
+}
+
+/* Click feedback (no moving up) */
+.theme-btn:active{
+  transform: scale(0.98);
+}
+
+.theme-btn:focus-visible{
+  outline:none;
+  box-shadow: 0 0 0 3px rgba(255,215,0,.22), 0 10px 22px rgba(0,0,0,.22);
+}
+html[data-theme="dark"] .theme-btn:focus-visible{
+  box-shadow: 0 0 0 3px rgba(255,215,0,.22), 0 10px 26px rgba(0,0,0,.45);
+}
+
+@keyframes btnPulse{
+  0%{transform:scale(1)}
+  60%{transform:scale(1.07)}
+  100%{transform:scale(1)}
+}
+
+@keyframes snake{
+  from { --angle: 0deg; }
+  to   { --angle: 360deg; }
+}
+
+/* Screen */
+.screen{
+  position:relative;
+  background:var(--screen-bg);
+  padding:clamp(18px,3vw,42px);
+  min-height:420px;
+  overflow:hidden;
+  transition: background-color .35s ease;
+}
+
+/* Inside-screen animation (dark mode only) */
+.screen::before,
+.screen::after{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .35s ease;
+}
+
+html[data-theme="dark"] .screen::before{
+  opacity:1;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(120,170,255,.22), transparent 42%),
+    radial-gradient(circle at 82% 28%, rgba(170,120,255,.18), transparent 45%),
+    radial-gradient(circle at 50% 82%, rgba(120,255,220,.12), transparent 55%),
+    linear-gradient(180deg, #061028, #050814);
+  filter:saturate(1.2) contrast(1.05);
+  animation: nebulaDrift 14s ease-in-out infinite;
+}
+html[data-theme="dark"] .screen::after{
+  opacity:.70;
+  background: radial-gradient(rgba(255,255,255,.16) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mix-blend-mode: screen;
+  animation: sparkle 5.2s ease-in-out infinite;
+}
+
+@keyframes nebulaDrift{
+  0%{transform:translate3d(-2%,-1%,0) scale(1.02)}
+  50%{transform:translate3d( 2%, 1%,0) scale(1.03)}
+  100%{transform:translate3d(-2%,-1%,0) scale(1.02)}
+}
+@keyframes sparkle{
+  0%,100%{transform:translate3d(0,0,0); opacity:.50}
+  50%{transform:translate3d(1.2%,-.9%,0); opacity:.92}
+}
+
+.content{ position:relative; z-index:1; }
+
+/* Cards */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:clamp(18px,2.6vw,42px);
+  align-items:start;
+}
+
+.link{
+  text-decoration:none;
+  color:inherit;
+  outline:none;
+}
+
+.card{
+  display:grid;
+  gap:12px;
+  justify-items:center;
+}
+.card.mid{ margin-top:34px; }
+
+.label{
+  text-align:center;
+  font-size:clamp(26px,3vw,44px);
+  font-weight:500;
+  margin:6px 0 14px;
+  letter-spacing:.2px;
+  text-shadow:0 1px 0 rgba(255,255,255,.25);
+}
+
+.thumb{
+  width:100%;
+  aspect-ratio:1.35/1;
+  background:var(--card-bg);
+  border-radius:6px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  position:relative;
+  transition: transform .25s ease, filter .25s ease, box-shadow .25s ease;
+}
+.thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* Glow on hover */
+.link:hover .thumb,
+.link:focus-visible .thumb{
+  transform: scale(1.03);
+  filter: brightness(1.06);
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.35),
+    0 0 22px rgba(120,170,255,.45),
+    0 0 40px rgba(170,120,255,.25);
+}
+
+html[data-theme="dark"] .link:hover .thumb,
+html[data-theme="dark"] .link:focus-visible .thumb{
+  box-shadow:
+    0 18px 44px rgba(0,0,0,.55),
+    0 0 28px rgba(255,255,255,.12),
+    0 0 26px rgba(120,170,255,.55),
+    0 0 55px rgba(120,255,220,.22),
+    0 0 70px rgba(170,120,255,.18);
+}
+
+/* Responsive */
+@media (max-width: 860px){
+  body{ padding:12px; }
+  .grid{ grid-template-columns:1fr; }
+  .card.mid{ margin-top:0; }
+  .thumb{ max-width:520px; }
+}
